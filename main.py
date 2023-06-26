@@ -3,126 +3,128 @@ import streamlit as st
 import pandas as pd
 import os
 import sys
+from Utils.utils import *
+
+class dashboard:
+    def __init__(self):
+        self.df = pd.read_excel('Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Feuil1')
+        self.df_bridges_only = self.df.copy().drop(['Feasibility criteria?', 'Numeric?', 'For comparison?'], axis=1)
+        self.numeric_dict = {}     # Dictionary that will store numeric sidebar outputs
+        self.non_numeric_dict = {}     # Dictionary that will store non-numeric sidebar outputs
+
+    def sidebar(self):
+        ########################
+        ### Sidebar contents ###
+        ########################
+        # st.sidebar.subheader('Feasibility Criteria')
+
+        # List of feasibility criteria
+        feasibility_criteria = self.df.loc[self.df['Feasibility criteria?'] == 'Yes'].index.to_list()
+        # Multiselect for the feasibility criteria selected
+        feasibility_criteria_selected = st.sidebar.multiselect('Feasibility Criteria', options=feasibility_criteria)
+
+        #####################################
+        ### Numeric feasibility criteria ###
+        #####################################
+        # Dictionary to store numeric sidebar outputs
+
+        # List of numeric feasibility criteria
+        numeric_criteria = list(self.df.loc[(self.df['Numeric?'] == 'Yes') &
+                                            (self.df.index.isin(feasibility_criteria_selected))].index)
+        st.sidebar.subheader('Numeric Criteria')
+        # Slider for numeric feasibility criteria
+        for key, item in enumerate(numeric_criteria):
+            self.numeric_dict[item] = st.sidebar.slider(item, min_value=0, max_value=self.df_bridges_only.loc[item].max(), value=0)
+
+        #####################################
+        ### Non-numeric feasibility criteria ###
+        #####################################
+        st.sidebar.subheader('Non-Numeric Criteria')
+        # List of non-numeric feasibility criteria
+        non_numeric_criteria = list(self.df.loc[(self.df['Numeric?'] == 'No')
+                                                & (self.df.index.isin(feasibility_criteria_selected))].index)
 
 
-def dashboard_streamlit():
-    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(SCRIPT_DIR))
+        # Dictionary to store non-numeric sidebar outputs
+        # Multi-select for non-numeric feasibility criteria
+        for key, item in enumerate(non_numeric_criteria):
+            tmp = self.df_bridges_only.loc[non_numeric_criteria[key]].apply(break_at_semicolon).to_list()
+            unique_values = list(set([item for sublist in tmp for item in sublist]))
+            self.non_numeric_dict[item] = st.sidebar.multiselect(item, options=unique_values)
 
-    apptitle = 'Trial Dashboard'
-    st.set_page_config(page_title=apptitle, page_icon=":eyeglasses:")
-    st.title('Trial Dashboard')
+    def main_page(self):
+        ################
+        ### Resources ###
+        ################
+        st.subheader('List of Resources')
+        resources = self.df_bridges_only.loc['Resources', :].to_dict()
+        for bridge_type, value in resources.items():
+            st.markdown(f'**{bridge_type}**')
+            resrce = markdown_string_of_links(value)
+            for link in resrce:
+                st.markdown(link, unsafe_allow_html=True)
 
-    # Load data
-    df = pd.read_excel('Test_data.xlsx', header=0, index_col=0)
-    
-    # Get column names and datatypes as a dictionary
-    columns = df.columns.tolist()
-    # columns.remove('Unnamed: 0')
-    datatypes = df.dtypes.tolist()
-    dtype_dict = dict(zip(columns, datatypes))
-    # col_dict = dict(zip(columns, datatypes))
+        ################
+        #### Graphs ####
+        ################
+        st.subheader('Numeric characteristics of selected bridges')
+        numeric_data_display = self.df_bridges_only.copy().loc[self.df['Numeric?'] == 'Yes', :]
+        numeric_data_display = check_numeric_criteria(self.numeric_dict, numeric_data_display)
+        for indx in numeric_data_display.index:
+            st.bar_chart(numeric_data_display.loc[indx, :])
 
-    # Dictionary of columns and their respective checkbox values
-    col_dict = {}
+        #############
+        ### Tables ###
+        #############
+        st.subheader('Non-numeric characteristics of selected bridges')
 
-    # Checkboxes for all columns in columns list
-    st.sidebar.subheader('Feasibility Criteria')
-    for col in columns:
-        col_dict[col] = st.sidebar.checkbox(col, value=True)
+        # filter_dict = self.non_numeric_dict.copy()   # we copy the dictionary to apply make_regex on it
+        # for key, item in filter_dict.items():
+        #     filter_dict[key] = make_regex(item)
 
-    # A number input for numeric columns in dtype_dict
-    numeric_dict_filtered = {}   # Empty dictionary to store numeric column filtering values
-    numeric_dict = {}   # Empty dictionary to store all numeric column values
-    st.sidebar.subheader('Numeric Criteria')
+        # We will filter the dataframe to only show the bridges with the selected non-numeric characteristics
+        non_numeric_data = self.df_bridges_only.copy()
+        non_numeric_data = non_numeric_data.loc[(self.df['Numeric?'] == 'No')&(self.df['For comparison?'] == 'Yes')]
 
-    # Collecting the numeric values into a dictionary
-    for key, value in dtype_dict.items():
-        if value == 'int64' or value == 'float64':
-            if col_dict[key] == True:
-                numeric_dict_filtered[key] = st.sidebar.number_input(key, value=0)
+        # Filter the dataframe to only show the bridges with the selected non-numeric characteristics
+        non_numeric_data_display = check_strings_in_df(self.non_numeric_dict, non_numeric_data)
+        st.dataframe(non_numeric_data_display)
 
-    # A multiselect for non-numeric columns in dtype_dict which have value = True in col_dict
-    non_numeric_dict_filtered = {}   # Empty dictionary to store non-numeric column filtering values
-    non_numeric_dic = {}   # Empty dictionary to store all non-numeric column values
-    st.sidebar.subheader('Non-Numeric Criteria')
-    for key, value in dtype_dict.items():
-        if value == 'object':
-            if col_dict[key] == True:
-                non_numeric_dict_filtered[key] = st.sidebar.multiselect(key, options=df[key].unique().tolist())
+        ########################
+        ### Additional info ####
+        ########################
+        st.subheader('Additional information')
+        additional_info = self.df_bridges_only.copy().loc[self.df['For comparison?'] == 'No', :].to_dict()
+        for bridge_type, info in additional_info.items():
+            with st.expander(bridge_type):
+                for criterion, value in info.items():
+                    if criterion == 'Image':
+                        st.image(value)
+                    if value != 'nan':
+                        st.markdown(f'**{criterion}**')
+                        st.markdown(value)
 
+    def dashboard_streamlit(self):
+        # self.df = self.df.T
+        SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+        sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-    # Select all columns with value=False for plotting
-    columns_plotting = [key for key, value in col_dict.items() if value == False]
+        apptitle = 'Dashboard V1'
+        st.set_page_config(page_title=apptitle, page_icon=":eyeglasses:")
+        st.title('Rural Infrastructure Matrix')
 
-    # # Filter dataframe based on checkbox values
-    # df_display = df[columns_plotting]
+        # Convert columns with 'Numeric?' = 'Yes' to numeric
+        for indx in self.df.loc[self.df['Numeric?'] == 'Yes'].index:
+            self.df_bridges_only.loc[indx, :] = self.df_bridges_only.loc[indx, :].astype(int)
 
-    # We will define two different dataframes, one that will be used for plotting and one that will be used for displaying
-    # the numeric columns that are being considered for plotting
-    # for plotting
-    df_plotting = df.copy()   # Copying the original dataframe, to avoid a local unbound error if
-    # numeric_dict_filtered is empty
-    for key, value in numeric_dict_filtered.items():
-        df_plotting = df.loc[(df[key] > value), :]
+        tab1, tab2 = st.tabs(['Options', 'Evaluation'])
+        # Run sidebar
+        with tab1:
+            self.sidebar()
+            self.main_page()
 
-
-    # for plotting
-    # for key, value in numeric_dict_filtered.items():
-    #     df_showing_plot = df.loc[(df[key] > value) & (df[key] < 1E5), numeric_dict_filtered.keys()]
-    keys_shown = [key for key in col_dict.keys() if col_dict[key] == False and dtype_dict[key] == 'int64' or dtype_dict[key] == 'float64']
-    df_showing_plot = df[keys_shown]
-
-    # Original data frame
-    st.subheader('Original Data Frame')
-    st.write(df.replace(99999, 'NA'))
-
-    # # Data Frame Being Considered for Plotting
-    # st.subheader('Data Frame Being Considered for Plotting')
-    # st.write(df_display)
-
-    # Plotting
-    st.subheader('Plotting')
-    try:
-        st.write(df_showing_plot.replace(99999, 'NA'))
-    except UnboundLocalError:
-        st.write('No numeric columns selected')
-
-    # Bar plot of numeric columns in df_plotting
-    st.subheader('Bar Plot of Numeric Columns')
-    try:
-        for key, value in dtype_dict.items():
-            if value == 'int64' or value == 'float64':
-                if col_dict[key] == False:
-                    # We're dropping the rows with value 99999 because they are just fillers
-                    st.bar_chart(df_plotting[key].drop(df_plotting[df_plotting[key] == 99999].index, inplace=False))
-    except UnboundLocalError:
-        st.write('No numeric columns selected')
-
-
-    # Define df_write by filtering out the columns not in non_numeric_dict_filtered
-    df_write = df[[key for key in df.columns if key not in numeric_dict_filtered.keys()]]
-
-    # For each list in non_numeric_dict_filtered, filter df_write by the values in that list
-    for key, value in non_numeric_dict_filtered.items():
-        df_write = df_write[df_write[key].isin(value)]
-
-    # For each non-numeric column in df_plotting, for each unique value, list the indices that have that value
-    st.subheader('List of non-numeric values')
-    try:
-        for key, value in non_numeric_dict_filtered.items():
-            st.subheader(key)
-
-            for unique_value in df_write[key].unique().tolist():
-                options_with_value = ', '.join(df_write.index[df_write[key] == unique_value].tolist())
-                st.write(f"**{unique_value}**" + ": " + options_with_value)
-
-    except UnboundLocalError:
-        st.write('No non-numeric columns selected')
 
 
 if __name__ == '__main__':
-    dashboard_streamlit()
-
-
-
+    dashboard = dashboard()
+    dashboard.dashboard_streamlit()
