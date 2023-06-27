@@ -1,13 +1,15 @@
 # Making a streamlit app
+import numpy as np
 import streamlit as st
 import pandas as pd
 import os
 import sys
+from PIL import Image
 from Utils.utils import *
 
 class dashboard:
     def __init__(self):
-        self.df = pd.read_excel('Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Feuil1')
+        self.df = pd.read_excel('Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Data')
         self.df_bridges_only = self.df.copy().drop(['Feasibility criteria?', 'Numeric?', 'For comparison?'], axis=1)
         self.numeric_dict = {}     # Dictionary that will store numeric sidebar outputs
         self.non_numeric_dict = {}     # Dictionary that will store non-numeric sidebar outputs
@@ -52,6 +54,14 @@ class dashboard:
             unique_values = list(set([item for sublist in tmp for item in sublist]))
             self.non_numeric_dict[item] = st.sidebar.multiselect(item, options=unique_values)
 
+        # #################################
+        # ### Choice of evaluation mode ###
+        # #################################
+        # st.sidebar.subheader('Evaluation Mode')
+        # evaluation_mode = st.sidebar.radio('Evaluation Mode', ['Flowchart', 'Matrix Format'])
+
+
+
     def main_page(self):
         ################
         ### Resources ###
@@ -70,6 +80,8 @@ class dashboard:
         st.subheader('Numeric characteristics of selected bridges')
         numeric_data_display = self.df_bridges_only.copy().loc[self.df['Numeric?'] == 'Yes', :]
         numeric_data_display = check_numeric_criteria(self.numeric_dict, numeric_data_display)
+        # numeric_data_display = wrap_dataframe_column_names(numeric_data_display)    # Add newlines to column names to
+        # make them fit in the graph
         for indx in numeric_data_display.index:
             st.bar_chart(numeric_data_display.loc[indx, :])
 
@@ -88,7 +100,7 @@ class dashboard:
 
         # Filter the dataframe to only show the bridges with the selected non-numeric characteristics
         non_numeric_data_display = check_strings_in_df(self.non_numeric_dict, non_numeric_data)
-        st.dataframe(non_numeric_data_display)
+        st.table(replace_semicolon_with_newline(non_numeric_data_display))
 
         ########################
         ### Additional info ####
@@ -99,10 +111,16 @@ class dashboard:
             with st.expander(bridge_type):
                 for criterion, value in info.items():
                     if criterion == 'Image':
-                        st.image(value)
-                    if value != 'nan':
+                        image_use = Image.open(value)
+                        st.image(image_use, use_column_width=True)
+                    if isinstance(value, str) and (criterion != 'Image'):
                         st.markdown(f'**{criterion}**')
-                        st.markdown(value)
+                        st.markdown(break_make_list(value))
+
+                    if isinstance(value, float):
+                        if not np.isnan(value):
+                            st.markdown(f'**{criterion}**')
+                            st.markdown(value)
 
     def dashboard_streamlit(self):
         # self.df = self.df.T
