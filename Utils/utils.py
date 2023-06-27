@@ -1,5 +1,6 @@
 import pandas as pd
 from collections import namedtuple
+import textwrap
 
 link = namedtuple('link', ['name', 'link'])    # Will be used to store links in a named tuple
 
@@ -22,9 +23,42 @@ def markdown_string_of_links(input_string):
     output_list = [f'[{strng[0]}]({strng[1]})' for strng in output_string]
     return output_list
 
+def break_make_list(input_string):
+    '''Break the input string at the semicolon and join elements so that the resulting string in markdown
+    format is a bulleted list'''
+    output_string = break_at_semicolon(input_string)
+    if len(output_string) == 1:
+        return input_string
+    else:
+        output_string = [f'- {strng}' for strng in output_string]
+        return '\n'.join(output_string)
 
 
+def replace_semicolon_with_newline(input_dataframe):
+    '''Replace semicolon with newline in every element of the dataframe
+    that is a string'''
+    for col in input_dataframe.columns:
+        if input_dataframe[col].dtype == 'object':
+            input_dataframe[col] = input_dataframe[col].replace(';', '\n\n', regex=True)
+    return input_dataframe
 
+
+def add_newline(string):
+    '''Add a newline to every second word in the string'''
+    words = string.split()  # Split the string into words
+    new_string = ' '.join(words[i] if (i + 1) % 2 != 0 else words[i] + '\n' for i in range(len(words)))
+    return new_string
+
+
+def add_newline_to_df_columns(input_dataframe):
+    '''Add a newline to every second word in the dataframe column names'''
+    input_dataframe.columns = [add_newline(col) for col in input_dataframe.columns]
+    return input_dataframe
+
+def wrap_dataframe_column_names(input_dataframe):
+    '''Apply textwrap to the dataframe column names'''
+    input_dataframe.columns = [textwrap.fill(col, width=20) for col in input_dataframe.columns]
+    return input_dataframe
 
 
 def replace_span_and_eval(input_string, eval_value):
