@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import os
 import sys
+import urllib.request
 from PIL import Image
 from Utils.utils import *
 
@@ -96,7 +97,7 @@ class dashboard:
 
         # We will filter the dataframe to only show the bridges with the selected non-numeric characteristics
         non_numeric_data = self.df_bridges_only.copy()
-        non_numeric_data = non_numeric_data.loc[(self.df['Numeric?'] == 'No')&(self.df['For comparison?'] == 'Yes')]
+        non_numeric_data = non_numeric_data.loc[(self.df['Numeric?'] == 'No') & (self.df['For comparison?'] == 'Yes')]
 
         # Filter the dataframe to only show the bridges with the selected non-numeric characteristics
         non_numeric_data_display = check_strings_in_df(self.non_numeric_dict, non_numeric_data)
@@ -111,8 +112,10 @@ class dashboard:
             with st.expander(bridge_type):
                 for criterion, value in info.items():
                     if criterion == 'Image':
+                        # urllib.request.urlopen(value, f"{bridge_type}.jpg")
+                        # image_use = Image.open(f'{bridge_type}.jpg')
                         image_use = Image.open(value)
-                        st.image(image_use, use_column_width=True)
+                        # st.image(image_use, use_column_width=True)
                     if isinstance(value, str) and (criterion != 'Image'):
                         st.markdown(f'**{criterion}**')
                         st.markdown(break_make_list(value))
