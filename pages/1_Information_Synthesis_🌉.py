@@ -252,11 +252,11 @@ class dashboard:
         for bridge_type, info in additional_info.items():
             with st.expander(bridge_type):
                 for criterion, value in info.items():
-                    if criterion == 'Image':
-                        # urllib.request.urlopen(value, f"{bridge_type}.jpg")
-                        # image_use = Image.open(f'{bridge_type}.jpg')
-                        image_use = Image.open(value)
-                        # st.image(image_use, use_column_width=True)
+                    # if criterion == 'Image':
+                    #     # urllib.request.urlopen(value, f"{bridge_type}.jpg")
+                    #     # image_use = Image.open(f'{bridge_type}.jpg')
+                    #     image_use = Image.open(value)
+                    #     # st.image(image_use, use_column_width=True)
                     if isinstance(value, str) and (criterion != 'Image'):
                         st.markdown(f'**{criterion}**')
                         st.markdown(break_make_list(value))
