@@ -9,9 +9,9 @@ os.environ["PATH"] += os.pathsep + r'C:\Program Files\Graphviz\bin'   #TODO: Com
 class dashboard_evaluation:
     def __init__(self):
         # Load data
-        self.bridges_evaluation = pd.read_excel(r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other_Docs\Dashboard_test\Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Decision Points')
+        # self.bridges_evaluation = pd.read_excel(r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other_Docs\Dashboard_test\Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Decision Points')
         # That's for debugging, the one for display is below
-        # self.bridges_evaluation = pd.read_excel('Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Decision Points')
+        self.bridges_evaluation = pd.read_excel('Excel Transcription of Data Analysis.xlsx', header=0, index_col=0, sheet_name='Decision Points')
         self.bridge_itself_selection_dict = {}   # Stores the 'bridge itself' selection
         self.bridge_site_selection_dict = {}     # Stores the 'bridge site' selection
         self.decision_points_selection_dict = {} # Stores the output of all the decision points selected
