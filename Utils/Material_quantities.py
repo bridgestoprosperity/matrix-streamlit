@@ -31,7 +31,7 @@ class materialQuantities:
             self.masonry_bridge_quantities.unskilled_labour = 0
 
             # Store in all
-            self.all_quantities.masonry_bridge_quantities = self.masonry_bridge_quantities
+            self.all_quantities.masonry_bridge = self.masonry_bridge_quantities
         else:
             # The formula for the concrete quantities was obtained from the work by Paul Dequeker, Architect. It was reprinted
             # in the BTC Uganda stone masonry bridge manual.

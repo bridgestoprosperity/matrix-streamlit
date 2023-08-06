@@ -113,11 +113,15 @@ class dashboard_evaluation:
 
 
     def save_display_graph(self):
-        # # Saves the graph when running on local machine
-        # self.graph.render(directory=os.getcwd()).replace('\\', '/')
-        # st.image('decision_tree.gv.png')
-        # Display graph when running on streamlit cloud
-        st.graphviz_chart(self.graph)
+        # Saves the graph when running on local machine
+        self.graph.render(directory=os.getcwd()).replace('\\', '/')
+        st.image('decision_tree.gv.png')
+        # # Display graph when running on streamlit cloud
+        # st.graphviz_chart(self.graph)
+
+    def sidebar(self):
+        # Create a slider for span
+        self.span = st.sidebar.slider('Span', min_value=0, max_value=100, value=0, step=1)
 
     def main_page(self):
         # Create a container with 4 columns
