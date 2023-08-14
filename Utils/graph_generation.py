@@ -122,8 +122,8 @@ class graph_generation:
             self.single_subgraph(counter_value)
 
     def save_display_graph(self):
-        # Saves the graph when running on local machine
-        self.graph.render(directory=os.getcwd()).replace('\\', '/')
+        # # Saves the graph when running on local machine
+        # self.graph.render(directory=os.getcwd()).replace('\\', '/')
         # st.image('decision_tree.gv.png')
         # # Display graph when running on streamlit cloud
         st.graphviz_chart(self.graph)
