@@ -504,13 +504,13 @@ class dashboard_evaluation:
 
     def download_report(self):
         # Create a button, which when clicked will send the span and the total costs to report_builder
-        if st.button('Download Report'):
-            report_builder(self.material_quantities_costs.span_slider, self.total_costs)
+        report_builder(self.material_quantities_costs.span_slider, self.total_costs)
 
 
     def evaluation_page_rendering(self):
         # Render the main page
         self.main_page()
+
 
 
 if __name__ == '__main__':
