@@ -1,5 +1,5 @@
 import streamlit as st
-import base64
+# import base64
 
 st.set_page_config(page_title='Welcome',
                    page_icon="👋")
