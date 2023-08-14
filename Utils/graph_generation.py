@@ -125,9 +125,9 @@ class graph_generation:
         # # # Saves the graph when running on local machine
         # self.graph.render(directory=os.getcwd()).replace('\\', '/')
         # st.image('decision_tree.gv.png')
-        # # Display graph when running on streamlit cloud
+        # Display graph when running on streamlit cloud
         st.graphviz_chart(self.graph)
-        # self.graph.render()    # Todo: In the final report, note that a workaround needs to be found to bundle
+        self.graph.render()    # Todo: In the final report, note that a workaround needs to be found to bundle
         # the dot command line tool with the app on GitHub.
 
     def make_graph(self):
