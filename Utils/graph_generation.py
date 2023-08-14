@@ -127,7 +127,8 @@ class graph_generation:
         # st.image('decision_tree.gv.png')
         # # Display graph when running on streamlit cloud
         st.graphviz_chart(self.graph)
-        self.graph.render()
+        # self.graph.render()    # Todo: In the final report, note that a workaround needs to be found to bundle
+        # the dot command line tool with the app on GitHub.
 
     def make_graph(self):
         # Makes the graph

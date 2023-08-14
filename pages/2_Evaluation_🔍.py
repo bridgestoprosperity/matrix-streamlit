@@ -6,6 +6,7 @@ from Utils.utils import *
 from Utils.material_quantities import materialQuantities
 from Utils.default_costs import defaultCostsSuspendedBridge, defaultCostsSuspensionBridge, defaultUnitCosts
 from Utils.graph_generation import graph_generation
+from Utils.downloadable_report import report_builder
 import plotly.graph_objects as go
 
 os.environ["PATH"] += os.pathsep + r'C:\Program Files\Graphviz\bin'   #TODO: Comment this out before push
@@ -498,13 +499,19 @@ class dashboard_evaluation:
                                            self.bridges_evaluation)
         graphGeneration.make_graph()
 
+        # Download Button
+        st.button('Download Report', on_click=self.download_report())
 
-
+    def download_report(self):
+        # Create a button, which when clicked will send the span and the total costs to report_builder
+        if st.button('Download Report'):
+            report_builder(self.material_quantities_costs.span_slider, self.total_costs)
 
 
     def evaluation_page_rendering(self):
         # Render the main page
         self.main_page()
+
 
 if __name__ == '__main__':
     dashboard = dashboard_evaluation()
