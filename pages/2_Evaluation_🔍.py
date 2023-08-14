@@ -12,8 +12,10 @@ os.environ["PATH"] += os.pathsep + r'C:\Program Files\Graphviz\bin'   #TODO: Com
 
 class material_quantities_costs:
     def __init__(self):
-        self.path = r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other_Docs\Dashboard_test\Excel Transcription of Data Analysis.xlsx'
-        # self.path = r'Excel Transcription of Data Analysis.xlsx'
+        # #For running on my local machine
+        # self.path = r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other_Docs\Dashboard_test\Excel Transcription of Data Analysis.xlsx'
+        # #For running on the server
+        self.path = r'Excel Transcription of Data Analysis.xlsx'
         # For debugger mode
         self.df = pd.read_excel(self.path, header=0, index_col=0, sheet_name='Data')  # For running the dashboard
         self.df_bridges_only = self.df.copy().drop(['Feasibility criteria?', 'Numeric?', 'For comparison?'], axis=1)
