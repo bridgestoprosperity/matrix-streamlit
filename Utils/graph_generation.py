@@ -127,6 +127,7 @@ class graph_generation:
         # st.image('decision_tree.gv.png')
         # # Display graph when running on streamlit cloud
         st.graphviz_chart(self.graph)
+        self.graph.render()
 
     def make_graph(self):
         # Makes the graph
