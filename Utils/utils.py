@@ -2,8 +2,10 @@ import pandas as pd
 from functools import partial
 from collections import namedtuple
 import textwrap
-
-link = namedtuple('link', ['name', 'link'])    # Will be used to store links in a named tuple
+import locale
+# locale.setlocale(locale.LC_ALL, 'en_US')
+#
+# link = namedtuple('link', ['name', 'link'])    # Will be used to store links in a named tuple
 
 def break_at_semicolon(input_string):
     if isinstance(input_string, float):
@@ -219,16 +221,54 @@ def barplot(df, title, x_label, y_label, x_axis_rotation=0, figsize=(10, 5)):
     ax.set_xticklabels(df.index, rotation=x_axis_rotation)
     return ax
 
-def round_non_nan(value, decimals=1):
+def round_non_nan(value, decimals=-2):
     """
     Custom function to round off non-NaN values.
     """
     if pd.notna(value) and isinstance(value, float):
-        return round(value, decimals)
+        value = round(value, decimals)
+        # value = "{:,.2f}".format(value)
+        return value
     else:
         return value
 
 
+
+def render_df_formatting(df):
+    # Define a function to format positive floats
+    def format_positive_float(value):
+        if pd.notna(value) and isinstance(value, float) and 0 < value < 1E9:
+            return f"{value:,.0f}"
+        elif pd.notna(value) and isinstance(value, float) and value > 1E9:
+            # 1E9 was the indicator value chosen for excessive span
+            return "Max span exceeded"
+
+    # Define a function to handle negative floats and NA values
+    def handle_negative_and_na(value):
+        if pd.notna(value):
+            if isinstance(value, float) and value > 0:
+                return format_positive_float(value)
+            elif isinstance(value, float) and value < 0:
+                return '0'
+            else:
+                return value
+
+    # Apply the functions to the entire DataFrame
+    processed_df = df.applymap(handle_negative_and_na)
+    return processed_df
+
+def unique_row_values(row):
+    """
+    Custom function to return a list of unique values from a dataframe row.
+    """
+    redundant_materials_list = row.str.split(';').tolist()
+    unique_materials_list = list(set([item.strip() for sublist in redundant_materials_list for item in sublist]))
+
+    # Remove empty strings
+    unique_materials_list = [item for item in unique_materials_list if item]
+    return unique_materials_list
+
+#
 
 if __name__ == '__main__':
     print(break_at_semicolon("1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20"))

@@ -9,8 +9,8 @@ import plotly.graph_objects as go
 from dotmap import DotMap
 from PIL import Image
 from Utils.utils import *
-from Utils.Material_quantities import materialQuantities
-from Utils.Default_costs import defaultCosts
+from Utils.material_quantities import materialQuantities
+from Utils.default_costs import defaultCostsSuspendedBridge
 
 class dashboard:
     def __init__(self):
@@ -29,19 +29,19 @@ class dashboard:
         ########################
         # st.sidebar.subheader('Feasibility Criteria')
 
-        #####################################
-        ### Numeric feasibility criteria ###
-        #####################################
-        # Dictionary to store numeric sidebar outputs
-
-        # List of numeric feasibility criteria
-        # numeric_criteria = list(self.df.loc[(self.df['Numeric?'] == 'Yes') &
-        #                                     (self.df.index.isin(feasibility_criteria_selected))].index)
-        st.sidebar.subheader('Bridge span (m) for cost calculation')
-
-        # Slider for span
-        self.span_slider = st.sidebar.slider('Span (m)', min_value=0, max_value=int(self.df_bridges_only.loc['Span (m)'].max())
-                                             , value=10)
+        # #####################################
+        # ### Numeric feasibility criteria ###
+        # #####################################
+        # # Dictionary to store numeric sidebar outputs
+        #
+        # # List of numeric feasibility criteria
+        # # numeric_criteria = list(self.df.loc[(self.df['Numeric?'] == 'Yes') &
+        # #                                     (self.df.index.isin(feasibility_criteria_selected))].index)
+        # st.sidebar.subheader('Bridge span (m) for cost calculation')
+        #
+        # # Slider for span
+        # self.span_slider = st.sidebar.slider('Span (m)', min_value=0, max_value=int(self.df_bridges_only.loc['Span (m)'].max())
+        #                                      , value=10)
 
         # # Slider for numeric feasibility criteria
         # for key, item in enumerate(numeric_criteria):
@@ -151,156 +151,6 @@ class dashboard:
         # # Using containers and tables, make a pseudo-list
         # non_numeric_data_display = markdown_list_from_dataframe(non_numeric_data_display)
 
-    def material_quantities_costs(self):
-        ####################################
-        ### Table of material quantities ###
-        ####################################
-        st.subheader('Material quantities of selected bridges')
-
-        # Explanation of the table in an expander
-        with st.expander('Explanation'):
-            st.write('''The table below shows the material quantities of the selected bridges. Values are calculated
-            per meter width of bridge deck. The quantities obtained do not include the substructure and earthworks. The
-            quantities are calculated using formula obtained from the literature. \nThe masonry arch bridge stone 
-            quantities are obtained from the formula by Paul Dequeker as given below:''')
-            st.latex(r'''Masonry\_stone = 0.075span^2 + 1.24span + 1.01''')
-            st.write('''for a Roman arch bridge, while the formula for a segmental arch bridge the formula is:''')
-            st.latex(r'''Masonry\_stone = 0.069span^2 + 1.42span + 1.42''')
-            st.write('''The quantities for skilled and unskilled labour are obtained from the following rules of thumb:''')
-            # Bulleted list of rules of thumb
-            st.write('''- Cement requirement: 1.5 - 1.8 bags per cubic meter of stone masonry for a 1:3 mix''')
-            st.write('''- Labour: 1 mason with 2 casual labourers construct 1.3 - 1.6 cubic meters of stone masonry per 
-            day''')
-
-
-
-        # Creating a material_quantities object with the span value
-        material_quantities = materialQuantities(self.span_slider)
-        material_quantities.calculate_quantities()
-
-        # Make first column bold
-        all_material_quantities = make_first_column_bold(material_quantities.all_quantities).fillna('')
-
-        # Replacing zeros with 'Max span exceeded' - has to be done as the last thing, otherwise some previous
-        # formatting won't work
-        all_material_quantities_display = all_material_quantities.replace(0, 'Max span exceeded')
-
-
-
-        # Write the contents as a plotly table
-        fig = go.Figure(data=[go.Table(
-            header=dict(values=list(all_material_quantities_display.columns),
-                        fill_color='#9cd1b4',
-                        align='left'),
-            cells=dict(values=[all_material_quantities_display[col] for col in all_material_quantities_display.columns],
-                       fill_color='#ecf7f1',
-                       align='left', height=25))
-        ])
-
-        # Update figure to make it wider, increase font size, increase the height of the rows and wrap text
-        fig.update_layout(width=1200, height=500, font_size=15, margin=dict(l=0, r=0, b=0, t=0))
-
-        st.write(fig)
-
-        #################################
-        ######### Costs ##################
-        #################################
-        st.header('Cost Calculation')
-        st.subheader('Items with per linear meter cost (Suspended Cable Bridge)')
-
-        # Getting the per linear meter cost of the items
-        default_costs = defaultCosts(self.path)
-        col1a, col2a = st.columns(2)
-        with col1a:
-            steel_decking_cost = st.number_input('Steel Decking Cost (USD)', min_value=0.0,
-                                                 max_value=default_costs.steel_decking*2,
-                                                 value=default_costs.steel_decking, step=0.1)
-            crossbeams_bolts = st.number_input('Crossbeams + Bolts Cost (USD)', min_value=0.0,
-                                                max_value=default_costs.crossbeams_bolts*2,
-                                                value=default_costs.crossbeams_bolts, step=0.1)
-            fencing = st.number_input('Fencing System (USD)', min_value=0.0, max_value=default_costs.fencing*2,
-                                        value=default_costs.fencing, step=0.1)
-        with col2a:
-            restraint_handrail = st.number_input('Restraint and Handrail Wires (USD)', min_value=0.0,
-                                                    max_value=default_costs.restraint_handrail*2,
-                                                    value=default_costs.restraint_handrail, step=0.1)
-            cables_clips = st.number_input('Cables and Clips Cost (USD)', min_value=0.0,
-                                                max_value=default_costs.cables_clips*2,
-                                                value=default_costs.cables_clips, step=0.1)
-
-        st.subheader('Lumpsum costs (Suspended Cable Bridge)')
-
-        # Getting the lumpsum costs
-        col1b, col2b = st.columns(2)
-        with col1b:
-            concrete_works_suspended_bridge = st.number_input('Concrete Works (USD)', min_value=0.0,
-                                                               max_value=default_costs.concrete_works_suspended_bridge * 2,
-                                                               value=default_costs.concrete_works_suspended_bridge, step=0.1)
-            steel_reinf_suspended_bridge = st.number_input('Steel Works (USD)', min_value=0.0,
-                                max_value=default_costs.steel_reinf_suspended_bridge*2,
-                                value=default_costs.steel_reinf_suspended_bridge, step=0.1)
-
-        # List of unit costs
-        # Numeric entry in two columns
-        st.subheader('Unit Costs for Other Items')
-        col1c, col2c = st.columns(2)
-        with col1c:
-            cement_cost = st.number_input('Cement Cost/50kg bag (USD)', min_value=0.0, max_value=default_costs.cement_cost*2,
-                                            value=default_costs.cement_cost, step=0.1)
-            steel_cost = st.number_input('Steel Cost/kg (USD)', min_value=0.0, max_value=default_costs.steel_cost*2,
-                                            value=default_costs.steel_cost, step=0.1)
-            skilled_labor_cost = st.number_input('Skilled Labor Cost/man-day (USD)', min_value=0.0, max_value=default_costs.skilled_labor_cost*2,
-                                                    value=default_costs.skilled_labor_cost, step=0.1)
-            masonry_cost = st.number_input('Masonry Cost/m3 (USD)', min_value=0.0, max_value=default_costs.masonry_cost*2,
-                                            value=default_costs.masonry_cost, step=0.1)
-
-        with col2c:
-            sand_cost = st.number_input('Sand Cost/m3 (USD)', min_value=0.0, max_value=default_costs.sand_cost*2,
-                                            value=default_costs.sand_cost, step=0.1)
-            aggt_cost = st.number_input('Aggregate (20mm) Cost/m3 (USD)', min_value=0.0, max_value=default_costs.aggt_cost*2,
-                                            value=default_costs.aggt_cost, step=0.1)
-            unskilled_labor_cost = st.number_input('Unskilled Labor Cost/man-day (USD)', min_value=0.0,
-                                                   max_value=default_costs.unskilled_labor_cost*2,
-                                                    value=default_costs.unskilled_labor_cost, step=0.1)
-
-        #### Unit costs (continued) ####
-        # Convert to pandas series, with same row names as all_quantities from the main_page
-        unit_costs = pd.Series([masonry_cost, cement_cost, skilled_labor_cost, unskilled_labor_cost,
-                                steel_cost, sand_cost, aggt_cost], index=all_material_quantities.iloc[:, 0])
-        # costs = unit_costs * all_material_quantities.iloc[:, 1:].replace('', 0.0).astype(float)
-        # Multiply each column by the unit cost
-        costs = all_material_quantities.set_index('Material').replace('', 0.0).astype(float).multiply(unit_costs,
-                                                                                                 axis=0)
-        st.subheader('Total Costs for Bridge Superstructures')
-        # Create a table of total costs and plot as a plotly table
-        total_costs = costs.sum(axis=0).to_frame(name='Total Cost (USD)')
-
-        # Add the per linear meter costs multiplied by the span and the lumpsum costs
-        total_costs.loc['Suspended Cable Bridge'] += (
-                (steel_decking_cost + crossbeams_bolts + fencing
-                 + restraint_handrail + cables_clips) * self.span_slider
-                + concrete_works_suspended_bridge + steel_reinf_suspended_bridge)
-
-        # Formatting
-        total_costs = total_costs.reset_index().rename({'index': 'Bridge Type'}, axis=1)
-        total_costs = make_first_column_bold(total_costs).applymap(round_non_nan).fillna('')
-
-        # Replacing zeros with 'Max span exceeded' - has to be done as the last thing, otherwise some previous
-        # formatting won't work
-        total_costs = total_costs.replace(0, 'Max span exceeded')
-        fig = go.Figure(data=[go.Table(
-            header=dict(values=list(total_costs.columns),
-                        fill_color='#9cd1b4',
-                        align='left'),
-            cells=dict(values=[total_costs[col] for col in total_costs.columns],
-                       fill_color='#ecf7f1',
-                       align='left', height=25))
-        ])
-
-        # Update figure to make it wider, increase font size, increase the height of the rows and wrap text
-        fig.update_layout(width=1200, height=200, font_size=15, margin=dict(l=0, r=0, b=0, t=0))
-
-        st.write(fig)
 
 
     def additional_info(self):
@@ -354,7 +204,7 @@ class dashboard:
         # Display the sidebar and main page
         self.sidebar()
         self.comparison_table()
-        self.material_quantities_costs()
+        # self.material_quantities_costs()
         self.additional_info()
         self.resources()
 

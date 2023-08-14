@@ -20,15 +20,16 @@ class materialQuantities:
         self.box_culvert_quantities = DotMap()
         self.unvented_ford_quantities = DotMap()
         self.suspended_bridge_quantities = DotMap()
+        self.suspension_bridge_quantities = DotMap()
         self.all_quantities = DotMap()
 
     def masonry_bridge(self):
         # The maximum bridge span for a masonry bridge is 20m. If the span is greater than 20m, return a tuple of zeros
         if self.span > 20:
-            self.masonry_bridge_quantities.stone_vol = 0
-            self.masonry_bridge_quantities.cement_mass = 0
-            self.masonry_bridge_quantities.skilled_labour = 0
-            self.masonry_bridge_quantities.unskilled_labour = 0
+            self.masonry_bridge_quantities.stone_vol = 1E9
+            self.masonry_bridge_quantities.cement_mass = 1E9
+            self.masonry_bridge_quantities.skilled_labour = 1E9
+            self.masonry_bridge_quantities.unskilled_labour = 1E9
 
             # Store in all
             self.all_quantities.masonry_bridge = self.masonry_bridge_quantities
@@ -52,12 +53,12 @@ class materialQuantities:
     def box_culvert(self):
         # The maximum bridge span for a box culvert is 15m. If the span is greater than 15m, return a tuple of zeros
         if self.span > 15:
-            self.box_culvert_quantities.steel_mass = 0
-            self.box_culvert_quantities.cement_mass = 0
-            self.box_culvert_quantities.sand_vol = 0
-            self.box_culvert_quantities.aggregate_vol = 0
-            self.box_culvert_quantities.skilled_labour = 0
-            self.box_culvert_quantities.unskilled_labour = 0
+            self.box_culvert_quantities.steel_mass = 1E9
+            self.box_culvert_quantities.cement_mass = 1E9
+            self.box_culvert_quantities.sand_vol = 1E9
+            self.box_culvert_quantities.aggregate_vol = 1E9
+            self.box_culvert_quantities.skilled_labour = 1E9
+            self.box_culvert_quantities.unskilled_labour = 1E9
             # Store in all_quantities
             self.all_quantities.box_culvert = self.box_culvert_quantities
         else:
@@ -72,6 +73,12 @@ class materialQuantities:
             # The following equations are taken from Fragkakis et al. (2015)
             concrete_vol = -4.083 + 2.459 * b_net + 0.673 * h_net + 0.216 * h_over
             self.box_culvert_quantities.steel_mass = -562.023 + 284.674 * b_net + 98.080 * h_net + 20.913 * h_over
+
+            # # Minimum is 0 for both steel and concrete
+            # if self.box_culvert_quantities.steel_mass < 0:
+            #     self.box_culvert_quantities.steel_mass = 0
+            # if concrete_vol < 0:
+            #     concrete_vol = 0
 
             # The conversions from concrete volumes to quantities of cement, sand, and aggregate are taken from the
             # unit labour cost derivation obtained from interviews (assumed concrete class = C30).
@@ -109,6 +116,15 @@ class materialQuantities:
 
         # Store in all_quantities
         self.all_quantities.suspended_bridge = self.suspended_bridge_quantities
+    
+    def suspension_bridge(self):
+        # The quantities for skilled and unskilled man-days are taken from the Helvetas manual for the construction of
+        # suspension bridges.
+        self.suspension_bridge_quantities.skilled_labour = self.span * 1.3 + 400
+        self.suspension_bridge_quantities.unskilled_labour = self.span * 1.3 + 1300
+
+        # Store in all_quantities
+        self.all_quantities.suspension_bridge = self.suspension_bridge_quantities
 
 
     def calculate_quantities(self):
@@ -116,6 +132,7 @@ class materialQuantities:
         self.box_culvert()
         self.unvented_ford()
         self.suspended_bridge()
+        self.suspension_bridge()
 
         # Format all quantities
         # Make dataframe
@@ -131,14 +148,15 @@ class materialQuantities:
         self.all_quantities.drop(['_typ'], inplace=True)
 
         # Round off to 1 decimal place
-        self.all_quantities = self.all_quantities.reset_index().applymap(round_non_nan)
+        self.all_quantities = self.all_quantities.reset_index().applymap(round_non_nan, decimals=1)
 
         # Rename columns
         self.all_quantities = (
             self.all_quantities
                 .rename(columns={'masonry_bridge': 'Masonry Stone Arch Bridge',
                                 'suspended_bridge': 'Suspended Cable Bridge', 'unvented_ford':
-                                'Reinforce Concrete Unvented Ford', 'box_culvert': 'Box Culvert',
+                                'Reinforced Concrete Unvented Ford', 'box_culvert': 'Box Culvert',
+                                 'suspension_bridge': 'Suspension Bridge',
                                  'index': 'Material',
                                  })
             )
