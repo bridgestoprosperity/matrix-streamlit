@@ -33,8 +33,8 @@ def set_png_as_page_bg(png_file):
     st.markdown(page_bg_img, unsafe_allow_html=True)
     return
 
-# When running it locally
-set_png_as_page_bg(r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other Images\Helvetas_Bridge_clipped.png')
+# # When running it locally
+# set_png_as_page_bg(r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other Images\Helvetas_Bridge_clipped.png')
 # When running it on the server
 set_png_as_page_bg(r'.\Utils\Images\Helvetas_Bridge_clipped.png')
 
