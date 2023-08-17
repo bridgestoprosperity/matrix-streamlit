@@ -36,7 +36,7 @@ def set_png_as_page_bg(png_file):
 # # When running it locally
 # set_png_as_page_bg(r'C:\Users\mwendwa.kiko\Documents\Personal_Kiko\E4C_Internship\Other Images\Helvetas_Bridge_clipped.png')
 # When running it on the server
-set_png_as_page_bg(r'.\Utils\Images\Helvetas_Bridge_clipped.png')
+set_png_as_page_bg('Helvetas_Bridge_clipped.png')
 
 # page_bg_img = '''
 # <style>
