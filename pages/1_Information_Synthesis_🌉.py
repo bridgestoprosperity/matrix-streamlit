@@ -29,24 +29,6 @@ class dashboard:
         ########################
         # st.sidebar.subheader('Feasibility Criteria')
 
-        # #####################################
-        # ### Numeric feasibility criteria ###
-        # #####################################
-        # # Dictionary to store numeric sidebar outputs
-        #
-        # # List of numeric feasibility criteria
-        # # numeric_criteria = list(self.df.loc[(self.df['Numeric?'] == 'Yes') &
-        # #                                     (self.df.index.isin(feasibility_criteria_selected))].index)
-        # st.sidebar.subheader('Bridge span (m) for cost calculation')
-        #
-        # # Slider for span
-        # self.span_slider = st.sidebar.slider('Span (m)', min_value=0, max_value=int(self.df_bridges_only.loc['Span (m)'].max())
-        #                                      , value=10)
-
-        # # Slider for numeric feasibility criteria
-        # for key, item in enumerate(numeric_criteria):
-        #     self.numeric_dict[item] = st.sidebar.slider(item, min_value=0, max_value=self.df_bridges_only.loc[item].max(), value=0)
-
         #####################################
         ### Non-numeric feasibility criteria ###
         #####################################
@@ -111,45 +93,9 @@ class dashboard:
         # Write the contents as a plotly table
         non_numeric_data_display.fillna('', inplace=True)    # Replace NaN with empty string to get rid of NA values
 
-        # We wrap the column names to make them fit in the table, but only when the table has lots of columns
-        if len(list(non_numeric_data_display.columns)) > 3:
-            non_numeric_data_display = wrap_dataframe_column_values(replace_semicolon_with_linebreak(non_numeric_data_display))
-        else:
-            non_numeric_data_display = replace_semicolon_with_linebreak(non_numeric_data_display)
+        # Write the table in HTML with the desired formatting
+        st.markdown(make_html_table_from_dataframe(non_numeric_data_display), unsafe_allow_html=True)
 
-        # We name the axis and reset the index so that it appears in the table as a column
-        non_numeric_data_display.index.name = 'Evaluation criteria'
-        non_numeric_data_display.reset_index(inplace=True)
-
-        # Creating a material_quantities object with the span value
-        material_quantities = materialQuantities(self.span_slider)
-        material_quantities.calculate_quantities()
-
-        # Make first column bold
-        non_numeric_data_display = make_first_column_bold(non_numeric_data_display).fillna('')
-
-
-        # ## Write the contents as a html list
-        # # non_numeric_data_display = replace_text_with_bulleted_list(non_numeric_data_display)
-        # non_numeric_data_display = convert_dataframe_to_plotly_table(non_numeric_data_display, 'Suspended Cable Bridge')
-
-        # Write the contents as a plotly table
-        fig = go.Figure(data=[go.Table(
-            header=dict(values=list(non_numeric_data_display.columns),
-                        fill_color='#9cd1b4',
-                        align='left'),
-            cells=dict(values=[non_numeric_data_display[col] for col in non_numeric_data_display.columns],
-                       fill_color='#ecf7f1',
-                       align='left', height=25))
-        ])
-
-        # Update figure to make it wider, increase font size, increase the height of the rows and wrap text
-        fig.update_layout(width=1200, height=800, font_size=15, margin=dict(l=0, r=0, b=0, t=0))
-
-        st.write(fig)
-
-        # # Using containers and tables, make a pseudo-list
-        # non_numeric_data_display = markdown_list_from_dataframe(non_numeric_data_display)
 
 
 
