@@ -232,15 +232,15 @@ class material_quantities_costs:
                                                        max_value=default_unit_costs.unskilled_labor_cost*2,
                                                         value=default_unit_costs.unskilled_labor_cost, step=0.1)
 
-        ############################
-        #### Miscellaneaous costs ###
-        ############################
-        st.subheader('Miscellaneous Costs')
-        st.write('''Any other costs that should be included in the total cost of the bridge can be added here.
-        Note that the costs are lumpsum costs, not unit costs, and that they will be added to the total costs for all 
-        bridges.''')
+            ############################
+            #### Miscellaneaous costs ###
+            ############################
+            st.subheader('Miscellaneous Costs')
+            st.write('''Any other costs that should be included in the total cost of the bridge can be added here.
+            Note that the costs are lumpsum costs, not unit costs, and that they will be added to the total costs for all 
+            bridges.''')
 
-        misc_costs = st.number_input('Miscellaneous Costs (USD)', min_value=0.0, value=0.0, step=0.1)
+            misc_costs = st.number_input('Miscellaneous Costs (USD)', min_value=0.0, value=0.0, step=0.1)
 
 
         #### Unit costs (continued) ####
