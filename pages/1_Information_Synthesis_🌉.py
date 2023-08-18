@@ -47,7 +47,7 @@ class dashboard:
         # Multi-select for non-numeric feasibility criteria
         for key, item in enumerate(non_numeric_criteria):
             tmp = self.df_bridges_only.loc[non_numeric_criteria[key]].apply(break_at_semicolon).to_list()
-            unique_values = list(set([item for sublist in tmp for item in sublist if item != '']))
+            unique_values = list(set([item.strip('-') for sublist in tmp for item in sublist if item != '']))
             self.non_numeric_dict[item] = st.sidebar.multiselect(item, options=unique_values)
 
         # #################################

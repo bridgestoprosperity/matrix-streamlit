@@ -232,6 +232,17 @@ class material_quantities_costs:
                                                        max_value=default_unit_costs.unskilled_labor_cost*2,
                                                         value=default_unit_costs.unskilled_labor_cost, step=0.1)
 
+        ############################
+        #### Miscellaneaous costs ###
+        ############################
+        st.subheader('Miscellaneous Costs')
+        st.write('''Any other costs that should be included in the total cost of the bridge can be added here.
+        Note that the costs are lumpsum costs, not unit costs, and that they will be added to the total costs for all 
+        bridges.''')
+
+        misc_costs = st.number_input('Miscellaneous Costs (USD)', min_value=0.0, value=0.0, step=0.1)
+
+
         #### Unit costs (continued) ####
         # Convert to pandas series, with same row names as all_quantities from the main_page
         unit_costs = pd.Series([masonry_cost, cement_cost, skilled_labor_cost, unskilled_labor_cost,
@@ -240,6 +251,8 @@ class material_quantities_costs:
         # Multiply each column by the unit cost
         costs = all_material_quantities.set_index('Material').replace('', 0.0).astype(float).multiply(unit_costs,
                                                                                                  axis=0)
+
+        ### Total costs ###
         st.subheader('Total Costs for Bridge Superstructures')
         # Create a table of total costs and plot as a plotly table
         self.total_costs = costs.sum(axis=0).to_frame(name='Total Cost (USD)')
@@ -256,6 +269,7 @@ class material_quantities_costs:
                     + restraint_handrail_suspension + cables_clips_suspension) * self.span_slider
                 + concrete_works_suspension_bridge + steel_reinf_suspension_bridge + tower_system_suspension_bridge)
 
+        self.total_costs += misc_costs
 
         # Formatting
         self.total_costs = self.total_costs.reset_index().rename({'index': 'Bridge Type'}, axis=1)
