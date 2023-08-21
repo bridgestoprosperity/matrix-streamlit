@@ -54,7 +54,8 @@ with col1:
     st.markdown('''\n\nWelcome to the Rural Infrastructure Matrix. This tool is designed to help you identify the most appropriate
             crossing structure for your project. The tool was developed by Bridges to Prosperity, who are doing lots of
             work to improve rural access in developing countries. You can find out more about them
-            [here](https://bridgestoprosperity.org/).''')
+            [here](https://bridgestoprosperity.org/). \n\nYou can find information on how to use the tool 
+            [here](https://www.youtube.com/watch?v=WTWmrwjQzog).''')
 
 #
 
