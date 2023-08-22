@@ -108,7 +108,7 @@ def make_html_table_from_dataframe(input_dataframe):
     <html>
     <head>
     <style> 
-      table, th, td {{font-size:11pt; border:1px solid black; border-collapse:collapse; text-align:left; 
+      table, th, td {{font-size:11pt; border:1px solid black; border-collapse:collapse; text-align:justify; 
       vertical-align:top; background-color: #ecf7f1;}}
       th, td {{padding: 5px;}}
       th {{background-color: #9cd1b4;}}
