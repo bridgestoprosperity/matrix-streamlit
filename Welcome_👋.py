@@ -51,11 +51,33 @@ set_png_as_page_bg('Helvetas_Bridge_clipped.png')
 
 col1, col2 = st.columns(2)
 with col1:
-    st.markdown('''\n\nWelcome to the Rural Infrastructure Matrix. This tool is designed to help you identify the most appropriate
-            crossing structure for your project. The tool was developed by Bridges to Prosperity, who are doing lots of
-            work to improve rural access in developing countries. You can find out more about them
-            [here](https://bridgestoprosperity.org/). \n\nYou can find information on how to use the tool 
-            [here](https://www.youtube.com/watch?v=WTWmrwjQzog).''')
+    # st.markdown('''\n\nWelcome to the Rural Infrastructure Matrix. This tool is designed to help you identify the most appropriate
+    #         crossing structure for your project. The tool was developed by Bridges to Prosperity, who are doing lots of
+    #         work to improve rural access in developing countries. You can find out more about them
+    #         [here](https://bridgestoprosperity.org/). \n\nYou can find information on how to use the tool
+    #         [here](https://www.youtube.com/watch?v=WTWmrwjQzog).''')
+    st.markdown(
+        """<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rural Infrastructure Matrix</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: justify;
+                margin: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <p>Welcome to the Rural Infrastructure Matrix. This tool is designed to help you identify the most appropriate 
+            crossing structure for your project. The tool was developed by Bridges to Prosperity, who are doing lots of 
+            work to improve rural access in developing countries. You can find out more about them 
+            <a href="https://bridgestoprosperity.org/">here</a>.</p>
+            <p>You can find information on how to use the tool <a href="https://www.youtube.com/watch?v=WTWmrwjQzog">here</a>.</p>
+        </body>
+</html>""", unsafe_allow_html=True)
+
 
 #
 
