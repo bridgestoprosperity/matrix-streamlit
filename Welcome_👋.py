@@ -75,7 +75,6 @@ with col1:
             work to improve rural access in developing countries. You can find out more about them 
             <a href="https://bridgestoprosperity.org/">here</a>.</p>
             <p>You can find information on how to use the tool <a href="https://www.youtube.com/watch?v=WTWmrwjQzog">here</a>.</p>
-            
         </body>
 </html>""", unsafe_allow_html=True)
 
