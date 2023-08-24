@@ -413,7 +413,7 @@ class dashboard_evaluation:
 
 
     def main_page(self):
-        st.header('Dynamic Design Flowchart for Bridge Evaluation')
+        st.header('Bridge Type Evaluation Flowchart')
         with st.expander('Explanation of the flowchart'):
             st.write("""The dynamic flowchart below enables evaluation of the possible bridge options for a particular
             site. The evaluation can be made across three dimensions: \n- The characteristics of the bridge itself: these
