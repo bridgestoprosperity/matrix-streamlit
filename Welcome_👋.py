@@ -66,6 +66,7 @@ with col1:
                 font-family: Arial, sans-serif;
                 text-align: justify;
                 margin: 20px;
+                color: black;
                 }
             </style>
         </head>
